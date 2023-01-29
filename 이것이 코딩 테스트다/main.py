@@ -1,7 +1,12 @@
-N, M, K = map(int, input().split())
-arr = list(map(int, input().split()))
-arr.sort(reverse=True)
+stack = []
 
-sum = (arr[0]*K+5) * (M//(K+1)) + (M % (K+1) * 6)
+stack.append(5)
+stack.append(1)
+stack.append(3)
+stack.pop()
+stack.append(6)
 
-print(sum)
+print(stack) # [5, 1, 6]
+print(stack[::-1]) # [6, 1, 5]
+
+
