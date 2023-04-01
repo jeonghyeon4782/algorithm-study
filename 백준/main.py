@@ -11,11 +11,10 @@ if '0' not in n:
 else:
     for i in n:
         sum += int(i)
-    
+
     if sum % 3 == 0:
         n.sort(reverse=True)
         result = int(''.join(n))
         print(result)
     else:
         print('-1')
-        
