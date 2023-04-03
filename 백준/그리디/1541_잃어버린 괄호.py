@@ -6,20 +6,20 @@ d = True
 for i in range(0, len(a)):
     if (i == 0):
         b.append('(')
-        
+
     if (a[i] == '-'):
         b.append(')')
-        
+
     b.append(a[i])
-    
+
     if (a[i] == '-'):
         b.append('(')
-        
+
     if (i == len(a) - 1):
         b.append(')')
-        
+
 for i in b:
-    if (i == '(' or i ==')'):
+    if (i == '(' or i == ')'):
         c.append(i)
     elif (i == '0' and d == True):
         continue
@@ -31,5 +31,5 @@ for i in b:
         d = False
 
 c = "".join(c)
-    
+
 print(eval(c))
