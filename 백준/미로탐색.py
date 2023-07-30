@@ -1,4 +1,4 @@
-from collections import deque
+# from collections import deque
 
 n, m = map(int, input().split())
 board = [input() for _ in range(n)]
@@ -9,11 +9,26 @@ chk = [[False] * m for _ in range(n)]
 def is_vaild(sx, sy):
     return 0 <= sx < n and 0 <= sy < m
 
+def dfs(sx, sy, sd):
+    if sx == n - 1 and sy == m - 1:
+        print(sd)
+        return
+    
+    for i in range(4):
+        nx = dx[i] + sx
+        ny = dy[i] + sy
+        nd = sd + 1
+        
+        if is_vaild(nx, ny) and not chk[nx][ny] and board[nx][ny] == '1':
+            chk[nx][ny] = True
+            dfs(nx, ny, nd)
+            
+dfs(0,0,1)
 
 dq = deque()
 dq.append((0, 0, 1))
 chk[0][0] = True
-    
+
 while len(dq) > 0:
     x, y, d = dq.popleft()
         
@@ -62,5 +77,3 @@ while len(dq) > 0:
             chk[ny][nx] = True
             dq.append((ny, nx, nd))
                 
-
-
