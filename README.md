@@ -4,4 +4,8 @@
 - Python
 
 ### 사용 TOOL🖱️
-- vscode
+- VSCode
+
+### 사이🖱️
+- [VSCode](https://www.acmicpc.net/)https://www.acmicpc.net/
+- https://programmers.co.kr/
