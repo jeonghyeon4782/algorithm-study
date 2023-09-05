@@ -1,20 +1,18 @@
-arr = [0, 1, 2, 3, 4, 5, 6]
-
-def search(x, adj):
-    l = 0
-    r = len(adj) - 1
-    m = (l + r) // 2
+def search(arr, item):
+    left = 0
+    right = len(arr) - 1
+    mid = (left + right) // 2
     
-    while l <= r:
-        if adj[m] == x:
-            print(f'{x} 찾았습니다.')
-            return
-        elif adj[m] > x:
-            r = m - 1
+    while left <= right:
+        if arr[mid] == item:
+            print(arr[mid])
+            break
+        elif arr[mid] > item:
+            right = mid - 1
         else:
-            l = m + 1
-        m = (r + l) // 2
-    
-    print("탐색 실패")
-    
-search(3, arr)
+            left = mid + 1
+        
+        mid = (left + right) // 2
+        
+arr = [0,1,2,3,4,5,6]
+search(arr, 3)
