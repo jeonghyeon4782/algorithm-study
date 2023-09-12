@@ -8,4 +8,4 @@ ans = []
 for i in list(map(int, input().split())):
     ans.append(bisect_right(arr, i) - bisect_left(arr, i))
 
-print(', '.join(map(str, ans)))
+print(' '.join(map(str, ans)))
