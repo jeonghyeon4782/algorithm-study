@@ -2,10 +2,10 @@ dx = (1, -1, 0, 0)
 dy = (0, 0, 1, -1)
 
 n = int(input())
-houses = []
-cnt = 0
 adj = [list(map(int, input())) for _ in range(n)]
 chk = [[False for _ in range(n)] for _ in range(n)]
+cnt = 0
+ans = []
 
 def is_valid(x, y):
     return 0 <= x < n and 0 <= y < n
@@ -13,24 +13,23 @@ def is_valid(x, y):
 def dfs(x, y):
     global cnt
     cnt += 1
+    chk[x][y] = True
     
-    for k in range(4):
-        nx = x + dx[k]
-        ny = y + dy[k]
+    for i in range(4):
+        nx = x + dx[i]
+        ny = y + dy[i]
         
-        if is_valid(nx, ny) and not chk[nx][ny] and adj[nx][ny]:
-            chk[nx][ny] = True
+        if is_valid(nx, ny) and adj[nx][ny] and not chk[nx][ny]:
             dfs(nx, ny)
             
 for i in range(n):
     for j in range(n):
-        cnt = 0
-        if not chk[i][j] and adj[i][j]:
-            chk[i][j] = True
+        if adj[i][j] and not chk[i][j]:
+            cnt = 0
             dfs(i, j)
-            houses.append(cnt)
-            
-houses.sort()
-print(len(houses))
-for i in houses:
-    print(i)
+            ans.append(cnt)
+
+print(len(ans))
+ans.sort()
+for k in ans:
+    print(k)
