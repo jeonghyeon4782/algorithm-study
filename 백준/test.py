@@ -1,7 +1,8 @@
-def  함수(n, m):
-    ans = 0
-    for i in range(n, m + 1):
-        ans += (i + n)
-    return ans
+from itertools import combinations
 
-print(함수(6 , 9))
+a = (1, 2, 3)
+b = (4, 5, 6)
+
+c = list(a + b)
+
+print(list(combinations(c, 2)))

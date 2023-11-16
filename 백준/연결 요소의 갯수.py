@@ -1,29 +1,33 @@
 import sys
+from collections import deque
 
 input = sys.stdin.readline
-sys.setrecursionlimit(10 ** 6)
 
 n , m = map(int, input().split())
-adj = [[False] * (n + 1) for _ in range(n + 1)]
-chk = [False] * (n + 1)
+adj = [[False for _ in range(n + 1)] for _ in range(n + 1)]
+chk = [False for _ in range(n + 1)] 
 ans = 0
 
 for _ in range(m):
     a, b = map(int, input().split())
-    adj[a][b] = True
-    adj[b][a] = True
+    adj[a][b] = adj[b][a] = True
     
-def dfs(i):
-    for j in range(1, n + 1):
-        if adj[i][j] and not chk[j]:
-            chk[j] = True
-            dfs(j)
-            
+def bfs(x):
+    dq = deque()
+    chk[x] = True
+    dq.append(x)
+    
+    while dq:
+        num = dq.popleft()
+        
+        for i in range(1, n + 1):
+            if num != i and not chk[i] and adj[num][i]:
+                dq.append(i)
+                chk[i] = True
+                
 for i in range(1, n + 1):
     if not chk[i]:
+        bfs(i)
         ans += 1
-        chk[i] = True
-        dfs(i)
         
 print(ans)
-            
