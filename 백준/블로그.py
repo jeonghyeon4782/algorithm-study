@@ -1,21 +1,20 @@
-import sys
-input = sys.stdin.readline
+n, m = map(int, input().split())
+visits = list(map(int, input().split()))
 
-n, x = map(int, input().split())
-visitor = list(map(int, input().split()))
+window = sum(visits[:m])
+max_window = window
+cnt = 1
 
-temp = 0
-cnt = 0
-
-for i in range(n - x + 1):
-    sum_visitor = sum(visitor[i : i + x])
-    temp = max(temp, sum_visitor)
-    
-for i in range(n - x + 1):
-    sum_visitor = sum(visitor[i : i + x])
-    if temp == sum_visitor:
+for i in range(n-m):
+    window = window + visits[i + m] - visits[i]
+    if max_window == window:
         cnt += 1
-    
-print(temp)
-print(cnt)
-    
+    else:
+        cnt = 1
+    max_window = max(window, max_window)
+
+if max_window == 0:
+    print('SAD')
+else:
+    print(max_window)
+    print(cnt)
