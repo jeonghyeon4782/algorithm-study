@@ -18,21 +18,32 @@ public class BJ_1253 {
 
         Arrays.sort(nums); // 오름차순 정렬
 
-        for (int i = 2; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             int s = 0;
-            int e = 1;
+            int e = n - 1;
             int sumNum = 0;
-            while (e < i) {
+
+            while (s < e) {
+
+                if (s == i) {
+                    s++;
+                    continue;
+                }
+                if (e == i) {
+                    e--;
+                    continue;
+                }
+
                 sumNum = nums[s] + nums[e];
                 if (sumNum < nums[i]) {
-                    e++;
+                    s++;
                 }
                 else if (sumNum == nums[i]) {
                     count++;
-                    s++;
+                    break;
                 }
                 else {
-                    s++;
+                    e--;
                 }
             }
         }
