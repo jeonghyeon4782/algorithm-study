@@ -68,7 +68,9 @@ public class BJ_2573 {
         while (true) {
 
             boolean stop = true; // 만약 모두 0이라면
-            chk = new boolean[n][m]; // 찾을 때마다 초기화
+            for (int i = 0; i < n; i++) {
+                Arrays.fill(chk[i], false); // 찾을 때마다 초기화
+            }
             int cnt = 0; // 분리된 빙산의 갯수
 
             minusList = new ArrayList<>();

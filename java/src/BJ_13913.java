@@ -6,10 +6,10 @@ import java.util.*;
 public class BJ_13913 {
     static int n, m;
     static Queue<String[]> q;
-    static boolean[] chk = new boolean[100001];
+    static boolean[] chk = new boolean[200001];
 
     static boolean is_valid(int x) {
-        return 0 <= x && x < 100001;
+        return 0 <= x && x < 200001;
     }
 
     static String bfs(int x) {
