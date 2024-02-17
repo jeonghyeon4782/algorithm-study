@@ -1,16 +1,17 @@
 import java.util.Scanner;
 
 public class BJ_14888 {
-    static int[] nums, op;
-    static int n, maxNum, minNum;
+
+    static int[] op, nums;
+    static int n;
+    static int maxNum = Integer.MIN_VALUE;
+    static int minNum = Integer.MAX_VALUE;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         n = sc.nextInt();
         nums = new int[n];
         op = new int[4];
-        maxNum = Integer.MIN_VALUE;
-        minNum = Integer.MAX_VALUE;
         for (int i = 0; i < n; i++) {
             nums[i] = sc.nextInt();
         }
@@ -22,7 +23,7 @@ public class BJ_14888 {
         System.out.println(minNum);
     }
 
-    public static void dfs(int num, int idx) {
+    private static void dfs(int num, int idx) {
         if (idx == n) {
             maxNum = Math.max(maxNum, num);
             minNum = Math.min(minNum, num);
@@ -30,7 +31,7 @@ public class BJ_14888 {
         }
 
         for (int i = 0; i < 4; i++) {
-            if (op[i] < 1) continue;
+            if (op[i] <= 0) continue;
             op[i]--;
             switch (i) {
                 case 0:
