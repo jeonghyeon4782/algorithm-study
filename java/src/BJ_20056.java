@@ -67,20 +67,10 @@ public class BJ_20056 {
     // 이동
     private static void move() {
         for (FireBall fireBall : fireBalls) {
-            fireBall.r += dr[fireBall.d] * fireBall.s;
-            fireBall.c += dc[fireBall.d] * fireBall.s;
-
-            // 만약 벗어난다면
-            if (fireBall.r < 1) {
-                fireBall.r = N - Math.abs(fireBall.r);
-            } else if (fireBall.r > N) {
-                fireBall.r = fireBall.r - N;
-            }
-            if (fireBall.c < 1) {
-                fireBall.c = N - Math.abs(fireBall.c);
-            } else if (fireBall.c > N) {
-                fireBall.c = fireBall.c - N;
-            }
+            int tempR = (fireBall.r + N + dr[fireBall.d] * (fireBall.s % N)) % N;
+            int tempC = (fireBall.c + N + dc[fireBall.d] * (fireBall.s % N)) % N;
+            fireBall.r = tempR;
+            fireBall.c = tempC;
         }
         // 같은 위치 합치기
         union();
@@ -121,8 +111,9 @@ public class BJ_20056 {
                     int newD;
                     if (EvenAddCheck(s, e)) newD = 0;
                     else newD = 1;
-                    for (int j = newD; j < 4; j += 2) {
-                        addFireBallList.add(new FireBall(now.r, now.c, newM, newS, j));
+                    for (int j = 0; j < 4; j++) {
+                        addFireBallList.add(new FireBall(now.r, now.c, newM, newS, newD));
+                        newD += 2;
                     }
                     removedIdxList.add(i);
                 }
@@ -149,3 +140,4 @@ public class BJ_20056 {
         return false;
     }
 }
+
