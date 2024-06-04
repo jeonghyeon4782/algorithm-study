@@ -13,7 +13,6 @@ public class BJ_1193 {
             System.out.printf("%d/%d", row, col);
             return;
         }
-
         while (true) {
             if (row == 1) {
                 ++cnt; ++col;
