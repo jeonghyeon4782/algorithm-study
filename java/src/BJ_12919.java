@@ -3,27 +3,36 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class BJ_12919 {
-    static StringBuilder S, T;
-    static boolean isExsist;
+    static String from, to;
+    static int found = 0;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        S = new StringBuilder(br.readLine());
-        T = new StringBuilder(br.readLine());
-        dfs(T);
-        System.out.println(isExsist ? 1 : 0);
+        from = br.readLine();
+        to = br.readLine();
+
+        dfs(new StringBuilder(to));
+        System.out.println(found);
     }
 
     public static void dfs(StringBuilder sb) {
-        if (sb.toString().equals(S.toString())) {
-            isExsist = true;
+        if (found == 1) return; // 이미 찾았다면 더 이상 탐색하지 않음
+        if (sb.toString().equals(from)) {
+            found = 1;
             return;
         }
-        if (sb.length() == 0 || isExsist) {
-            return;
+        if (sb.length() < from.length()) return;
+
+        if (sb.charAt(0) == 'B') {
+            StringBuilder newSb = new StringBuilder(sb);
+            newSb.deleteCharAt(0).reverse();
+            dfs(newSb);
         }
 
-            dfs(new StringBuilder(sb.substring(1)));
-            dfs(new StringBuilder(sb.substring(1)).reverse());
+        if (sb.charAt(sb.length() - 1) == 'A') {
+            StringBuilder newSb = new StringBuilder(sb);
+            newSb.deleteCharAt(sb.length() - 1);
+            dfs(newSb);
+        }
     }
 }
