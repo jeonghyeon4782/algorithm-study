@@ -5,48 +5,42 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class BJ_1253 {
+
+    static int N, cnt;
+    static int[] nums;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine());
-        int count = 0;
+        N = Integer.parseInt(br.readLine());
+        nums = new int[N];
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int[] nums = new int[n];
-
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < N; i++) {
             nums[i] = Integer.parseInt(st.nextToken());
         }
+        Arrays.sort(nums);
+        for (int i = 0; i < N; i++) {
+            solve(i);
+        }
+        System.out.println(cnt);
+    }
 
-        Arrays.sort(nums); // 오름차순 정렬
+    public static void solve(int target) {
+        int s = 0;
+        int e = nums.length - 1;
 
-        for (int i = 0; i < n; i++) {
-            int s = 0;
-            int e = n - 1;
-            int sumNum = 0;
-
-            while (s < e) {
-
-                if (s == i) {
-                    s++;
-                    continue;
-                }
-                if (e == i) {
-                    e--;
-                    continue;
-                }
-
-                sumNum = nums[s] + nums[e];
-                if (sumNum < nums[i]) {
-                    s++;
-                }
-                else if (sumNum == nums[i]) {
-                    count++;
-                    break;
-                }
+        while (s < e) {
+            if (nums[s] + nums[e] == nums[target]) {
+                if (s == target) s++;
+                else if (e == target) e--;
                 else {
-                    e--;
+                    cnt++;
+                    return;
                 }
+            } else if (nums[s] + nums[e] < nums[target]) {
+                s++;
+            } else {
+                e--;
             }
         }
-        System.out.println(count);
     }
 }
