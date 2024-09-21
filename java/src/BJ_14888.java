@@ -1,53 +1,68 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class BJ_14888 {
+    static int N, maxNum, minNum;
+    static int[] nums, operators;
 
-    static int[] op, nums;
-    static int n;
-    static int maxNum = Integer.MIN_VALUE;
-    static int minNum = Integer.MAX_VALUE;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        N = Integer.parseInt(br.readLine());
+        nums = new int[N];
+        operators = new int[4];
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        maxNum = Integer.MIN_VALUE;
+        minNum = Integer.MAX_VALUE;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        n = sc.nextInt();
-        nums = new int[n];
-        op = new int[4];
-        for (int i = 0; i < n; i++) {
-            nums[i] = sc.nextInt();
+        for (int i = 0; i < N; i++) {
+            nums[i] = Integer.parseInt(st.nextToken());
         }
+
+        st = new StringTokenizer(br.readLine());
         for (int i = 0; i < 4; i++) {
-            op[i] = sc.nextInt();
+            operators[i] = Integer.parseInt(st.nextToken());
         }
-        dfs(nums[0], 1);
+
+        dfs(0, nums[0]);
         System.out.println(maxNum);
         System.out.println(minNum);
     }
 
-    private static void dfs(int num, int idx) {
-        if (idx == n) {
-            maxNum = Math.max(maxNum, num);
+    private static void dfs(int depth, int num) {
+
+        if (depth == N - 1) {
             minNum = Math.min(minNum, num);
+            maxNum = Math.max(maxNum, num);
             return;
         }
 
         for (int i = 0; i < 4; i++) {
-            if (op[i] <= 0) continue;
-            op[i]--;
+
+            if (operators[i] == 0) continue;
+            operators[i]--;
+
             switch (i) {
                 case 0:
-                    dfs(num + nums[idx], idx + 1);
+                    dfs(depth + 1, num + nums[depth + 1]);
+                    operators[i]++;
                     break;
                 case 1:
-                    dfs(num - nums[idx], idx + 1);
+                    dfs(depth + 1, num - nums[depth + 1]);
+                    operators[i]++;
                     break;
                 case 2:
-                    dfs(num * nums[idx], idx + 1);
+                    dfs(depth + 1, num * nums[depth + 1]);
+                    operators[i]++;
                     break;
                 case 3:
-                    dfs(num / nums[idx], idx + 1);
+                    dfs(depth + 1, num / nums[depth + 1]);
+                    operators[i]++;
                     break;
             }
-            op[i]++;
         }
+
     }
 }
