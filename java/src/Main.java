@@ -1,59 +1,29 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public class Main {
-    static int N, R;
-    static int[] nums, input;
-    static boolean[] isSelected;
+
+    static int[] nums = {1, 3, 11, 2, 7, 99, 100};
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
-        R = sc.nextInt();
-        isSelected = new boolean[N];
-        nums = new int[N]; // 수들을 담을 숫자
-        input = new int[R]; // 출력할 숫자 보관
-
-        for (int i = 0; i < N; i++) {
-            nums[i] = sc.nextInt();
-        }
-
-//        순열(0);
-        조합(0, 0);
+        Arrays.sort(nums);
+        binarySearch(6);
     }
 
-    public static void 조합(int cnt, int start) {
+    public static void binarySearch(int target) {
+        int left = 0;
+        int right = nums.length;
 
-        if (cnt == R) {
-            System.out.println(Arrays.toString(input));
-            return;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+
+            if (target == nums[mid]) {
+                System.out.println(nums[mid] + "가 " + mid + "번째에 있습니다.");
+                return;
+            } else if (target < nums[mid]) {
+                right = mid - 1;
+            } else  {
+                left = mid + 1;
+            }
         }
-
-        for (int i = start; i < N; i++) {
-            input[cnt] = nums[i];
-            조합(cnt + 1, i + 1);
-        }
-
-    }
-
-    public static void 순열(int cnt) {
-
-        if (cnt == R) {
-            System.out.println(Arrays.toString(input));
-            return;
-        }
-
-        for (int i = 0; i < N; i++) {
-            if (isSelected[i]) continue;
-            input[cnt] = nums[i];
-            isSelected[i] = true;
-            순열(cnt + 1);
-            isSelected[i] = false;
-        }
-
     }
 }
