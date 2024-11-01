@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/src/BJ_15686.java" />
+      <file url="file://$PROJECT_DIR$/src/BJ_17144.java" />
+      <file url="file://$PROJECT_DIR$/src/BJ_1774.java" />
+      <file url="file://$PROJECT_DIR$/src/BJ_2636.java" />
+      <file url="file://$PROJECT_DIR$/src/SWEA_1953.java" />
+      <file url="file://$PROJECT_DIR$/src/BJ_11724.java" />
+    </excludeFromCompile>
+  </component>
+</project>

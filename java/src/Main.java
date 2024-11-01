@@ -3,27 +3,24 @@ import java.util.Arrays;
 public class Main {
 
     static int[] nums = {1, 3, 11, 2, 7, 99, 100};
+    static int n = 7;
+    static int m = 3;
+    static int[] input = new int[3];
+    static boolean[] isSelected = new boolean[n];
 
     public static void main(String[] args) {
-        Arrays.sort(nums);
-        binarySearch(6);
+        comb(0);
     }
 
-    public static void binarySearch(int target) {
-        int left = 0;
-        int right = nums.length;
-
-        while (left <= right) {
-            int mid = (left + right) / 2;
-
-            if (target == nums[mid]) {
-                System.out.println(nums[mid] + "가 " + mid + "번째에 있습니다.");
-                return;
-            } else if (target < nums[mid]) {
-                right = mid - 1;
-            } else  {
-                left = mid + 1;
-            }
+    public static void comb(int cnt) {
+        if (cnt == n) {
+            System.out.println(Arrays.toString(isSelected));
+            return;
         }
+
+        isSelected[cnt] = true;
+        comb(cnt + 1);
+        isSelected[cnt] = false;
+        comb(cnt + 1);
     }
 }
