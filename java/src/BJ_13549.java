@@ -1,50 +1,75 @@
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public class BJ_13549 {
-    static int[] arr;   // 최단 시간
-    static int N, K;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
-        K = sc.nextInt();
-        arr = new int[200001];
-        Arrays.fill(arr, Integer.MAX_VALUE);
-        arr[N] = 0;
+    static class Info {
+        int num, dist;
+
+        public Info(int num, int dist) {
+            this.num = num;
+            this.dist = dist;
+        }
+    }
+
+    static int N, K;
+    static int[] visited = new int[200001];
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+
+        for (int i = 1; i < 200001; i++) {
+            visited[i] = Integer.MAX_VALUE;
+        }
+
         if (N >= K) {
             System.out.println(N - K);
             return;
-        } else {
-            bfs();
         }
-        System.out.println(arr[K]);
+        System.out.println(bfs());
     }
 
-    public static void bfs() {
-        Queue<Integer> q = new LinkedList<>();
-        q.offer(N);
+    private static int bfs() {
+        Queue<Info> q = new LinkedList<>();
+        q.offer(new Info(N, 0));
+        visited[N] = 0;
+        int ans = Integer.MAX_VALUE;
 
         while (!q.isEmpty()) {
-            int now = q.poll();
-            if (now == K) {
-                break;
+            Info cur = q.poll();
+            if (cur.num == K) {
+                ans = Math.min(ans, cur.dist);
             }
 
-            if (now - 1 > 0 && arr[now - 1] > arr[now] + 1) {
-                q.offer(now - 1);
-                arr[now - 1] = arr[now] + 1;
-            }
-            if (now + 1 < 200001 && arr[now + 1] > arr[now] + 1) {
-                q.offer(now + 1);
-                arr[now + 1] = arr[now] + 1;
-            }
-            if (now * 2 < 200001 && arr[now * 2] > arr[now]) {
-                q.offer(now * 2);
-                arr[now * 2] = arr[now];
+            int nNum = 0;
+            for (int i = 0; i < 3; i++) {
+                if (i == 0){
+                    nNum = cur.num * 2;
+                    if (0 < nNum && nNum < 200001 && visited[nNum] > cur.dist) {
+                        q.offer(new Info(nNum, cur.dist));
+                        visited[nNum] = cur.dist;
+                    }
+                }
+                else if (i == 1) {
+                    nNum = cur.num + 1;
+                    if (0 < nNum && nNum < 200001 && visited[nNum] > cur.dist + 1) {
+                        q.offer(new Info(nNum, cur.dist + 1));
+                        visited[nNum] = cur.dist + 1;
+                    }
+                } else if (i == 2) {
+                    nNum = cur.num - 1;
+                    if (0 < nNum && nNum < 200001 && visited[nNum] > cur.dist + 1) {
+                        q.offer(new Info(nNum, cur.dist + 1));
+                        visited[nNum] = cur.dist + 1;
+                    }
+                }
             }
         }
+        return ans;
     }
 }
