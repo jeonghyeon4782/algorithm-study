@@ -3,33 +3,35 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class BJ_12919 {
+
     static String from, to;
-    static int found = 0;
+    static boolean flag;    // ture : 찾음, false : 못찾음
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         from = br.readLine();
         to = br.readLine();
+        StringBuilder sb = new StringBuilder(to);
 
-        dfs(new StringBuilder(to));
-        System.out.println(found);
+        dfs(sb);
+
+        System.out.println(flag ? 1 : 0);
     }
 
-    public static void dfs(StringBuilder sb) {
-        if (found == 1) return; // 이미 찾았다면 더 이상 탐색하지 않음
+    private static void dfs(StringBuilder sb) {
         if (sb.toString().equals(from)) {
-            found = 1;
+            flag = true;
             return;
         }
-        if (sb.length() < from.length()) return;
 
-        if (sb.charAt(0) == 'B') {
+        if (sb.length() > 1 && sb.charAt(0) == 'B') {
             StringBuilder newSb = new StringBuilder(sb);
-            newSb.deleteCharAt(0).reverse();
+            newSb.deleteCharAt(0);
+            newSb.reverse();
             dfs(newSb);
         }
 
-        if (sb.charAt(sb.length() - 1) == 'A') {
+        if (sb.length() > 1 && sb.charAt(sb.length() - 1) == 'A') {
             StringBuilder newSb = new StringBuilder(sb);
             newSb.deleteCharAt(sb.length() - 1);
             dfs(newSb);

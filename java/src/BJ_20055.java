@@ -1,67 +1,75 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public class BJ_20055 {
-    static int[] durability;    // 내구도
-    static boolean[] robots;    // 로봇의 유무
-    static int n, k;
+    static int N, K; // N : 2N은 컨베이어 벨트의 길이, K : 내구도 0인 칸이 K 이상이면 종료
+    static int[] belt;  // 컨베이어 벨트의 내구도
+    static boolean[] robots;    // 그 칸에 로봇이 존재하는지 여부 확인
+    static int zeroCnt;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        n = sc.nextInt();
-        k = sc.nextInt();
-        durability = new int[n * 2];
-        robots = new boolean[n * 2];
-        for (int i = 0; i < 2 * n; i++) {
-            durability[i] = sc.nextInt();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+        robots = new boolean[2 * N];
+        belt = new int[2 * N];
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < 2 * N; i++) {
+            int durability = Integer.parseInt(st.nextToken());
+            belt[i] = durability;
+            if (belt[i] == 0) zeroCnt++;
         }
 
-        int cnt = 0;
-
+        int time = 0;
         while (true) {
-            cnt++;
+            ++time;
             rotate();
             move();
-            if (durability[0] != 0) {
-                robots[0] = true;
-                durability[0]--;
-            }
-            if (chk() >= k) {
-                System.out.println(cnt);
-                break;
+            addRobot();
+            if (solve()) {
+                System.out.println(time);
+                return;
             }
         }
     }
 
-    public static void rotate() {
-        int temp = durability[n * 2 - 1];
-        for (int i = n * 2 - 1; i > 0; i--) {
-            if (i < n) {
-                robots[i] = robots[i - 1];
-            }
-            durability[i] = durability[i - 1];
-        }
-        robots[0] = false;
-        robots[n - 1] = false;
-        durability[0] = temp;
+    private static boolean solve() {
+        return zeroCnt >= K;
     }
 
-    public static void move() {
-        for (int i = n - 1; i > 0; i--) {
-            if (!robots[i] && robots[i - 1] && durability[i] >= 1) {
-                robots[i] = robots[i - 1];
-                robots[i - 1] = false;
-                durability[i]--;
-            }
+    private static void addRobot() {
+        if (belt[0] > 0 && !robots[0]) {
+            robots[0] = true;
+            belt[0]--;
+            if (belt[0] == 0) zeroCnt++;
         }
-        robots[n - 1] = false;
     }
 
-    public static int chk() {
-        int count = 0;
-        for (int i = 0; i < n * 2; i++) {
-            if (durability[i] == 0) count++;
+    private static void move() {
+        for (int i = N - 2; i >= 0; i--) { // N-2부터 시작
+            if (robots[i] && !robots[i + 1] && belt[i + 1] > 0) {
+                robots[i + 1] = true;
+                robots[i] = false;
+                belt[i + 1]--;
+                if (belt[i + 1] == 0) zeroCnt++;
+            }
         }
-        return count;
+        robots[N - 1] = false; // 내리는 위치에서 로봇 제거
+    }
+
+    private static void rotate() {
+        int lastBelt = belt[2 * N - 1];
+        boolean lastRobot = robots[2 * N - 1];
+        for (int i = 2 * N - 2; i >= 0; i--) {
+            belt[i + 1] = belt[i];
+            robots[i + 1] = robots[i];
+        }
+        belt[0] = lastBelt;
+        robots[0] = lastRobot;
+
+        robots[N - 1] = false; // 내리는 위치에서 로봇 제거
     }
 }
