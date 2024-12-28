@@ -1,42 +1,45 @@
-import java.io.*;
-import java.sql.Time;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
 
-    static class Time implements Comparable<Time>{
-        int s, e;
+    static int n, r;
+    static int[] input;
+    static int[] nums;
+    static int[] isSelected;
 
-        public Time(int s, int e) {
-            this.s = s;
-            this.e = e;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        nums = new int[n];
+        isSelected = new int[n];
+        r = Integer.parseInt(st.nextToken());
+        input = new int[r];
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < n; i++) {
+            nums[i] = Integer.parseInt(st.nextToken());
         }
-
-        public int compareTo(Time o) {
-            return this.e - o.e;
-        }
+        comb(0);
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        Time[] times = new Time[n];
-        int answer = 1;
-
-        for (int i = 0; i < n; i++) {
-            times[i] = new Time(sc.nextInt(), sc.nextInt());
+    private static void comb(int cnt) {
+        if (cnt == n) {
+            System.out.println(Arrays.toString(isSelected));
+            return;
         }
 
-        Arrays.sort(times);
-        int end = times[0].e;
-
-        for (int i = 1; i < times.length; i++) {
-            if (times[i].s >= end) {
-                answer++;
-                end = times[i].e;
-            }
-        }
-
-        System.out.println(answer);
+        isSelected[cnt] = 1;
+        comb(cnt + 1);
+        isSelected[cnt] = 2;
+        comb(cnt + 1);
+        isSelected[cnt] = 3;
+        comb(cnt + 1);
+        isSelected[cnt] = 4;
+        comb(cnt + 1);
     }
 }
