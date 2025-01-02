@@ -5,20 +5,10 @@ import java.util.ListIterator;
 
 class Main {
     public static void main(String[] args) {
-        List<Integer> list = new ArrayList<Integer>();
-        list.add(1);
-        list.add(2);
-        list.add(3);
-        list.add(4);
+       int a = 10;
+       long b = (long)1000000000 + 1000000000 * 100000;
 
-        ListIterator<Integer> iterator = list.listIterator();
-
-        while(iterator.hasNext()) {
-            int i = iterator.next();
-            if (i == 2) iterator.remove();
-            if (i == 3) iterator.add(10);
-        }
-
-        System.out.println(list);
+       if (a > b) System.out.println("a가 더 큼");
+       else System.out.println("b가 더 크거나 같음");
     }
 }
