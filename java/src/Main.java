@@ -1,14 +1,18 @@
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 class Main {
     public static void main(String[] args) {
-       int a = 10;
-       long b = (long)1000000000 + 1000000000 * 100000;
-
-       if (a > b) System.out.println("a가 더 큼");
-       else System.out.println("b가 더 크거나 같음");
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int[] map = new int[n];
+        int answer = 0;
+        String s = sc.next();
+        for (int i = 0; i < n; i++) {
+            map[i] = s.charAt(i) - '0';
+        }
+        for (int num : map) {
+            answer += num;
+        }
+        System.out.println(answer);
     }
 }

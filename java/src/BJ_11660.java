@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class BJ_11660 {
@@ -8,25 +9,23 @@ public class BJ_11660 {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
-        n++;
-        int m = Integer.parseInt(st.nextToken());;
-        int[][] nums = new int[n][n];
-        int[][] sumNums = new int[n][n];
-        for (int i = 1; i < n; i++) {
+        int m = Integer.parseInt(st.nextToken());
+        int[][] map = new int[n + 1][n + 1];
+        long[][] sumArr = new long[n + 1][n + 1];
+        for (int i = 1; i <= n; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 1; j < n; j++) {
-                nums[i][j] = Integer.parseInt(st.nextToken());
-                sumNums[i][j] = sumNums[i - 1][j] + sumNums[i][j - 1] - sumNums[i - 1][j - 1] + nums[i][j];
+            for (int j = 1; j <= n; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+                sumArr[i][j] = map[i][j] + sumArr[i - 1][j] + sumArr[i][j - 1] - sumArr[i - 1][j - 1];
             }
         }
         for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
-            int sx = Integer.parseInt(st.nextToken());
-            int sy = Integer.parseInt(st.nextToken());
-            int ex = Integer.parseInt(st.nextToken());
-            int ey = Integer.parseInt(st.nextToken());
-            int answer = sumNums[ex][ey] - sumNums[sx - 1][ey] - sumNums[ex][sy - 1] + sumNums[sx - 1][sy - 1];
-            System.out.println(answer);
+            int sr = Integer.parseInt(st.nextToken());
+            int sc = Integer.parseInt(st.nextToken());
+            int er = Integer.parseInt(st.nextToken());
+            int ec = Integer.parseInt(st.nextToken());
+            System.out.println(sumArr[er][ec] - sumArr[sr - 1][ec] - sumArr[er][sc - 1] + sumArr[sr - 1][sc - 1]);
         }
     }
 }
