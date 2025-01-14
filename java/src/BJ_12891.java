@@ -5,62 +5,48 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class BJ_12891 {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken()); // 문자 배열 크기
-        int m = Integer.parseInt(st.nextToken()); // 비밀번호 길이 제한
-        String s = br.readLine();
-        char[] dna = s.toCharArray(); // 문자 배열
+        int S = Integer.parseInt(st.nextToken());
+        int P = Integer.parseInt(st.nextToken());
+        char[] str = br.readLine().toCharArray();
+        int[] target = new int[4];
+        int ans = 0;
         st = new StringTokenizer(br.readLine());
-        int count = 0;
-        int[] acgt = new int[4];    // A C G T 문자의 갯수 제한
-        int[] cnt = new int[4];     // 비밀번호에 대한 문자 수 배열
-        boolean chk = true;
-        
         for (int i = 0; i < 4; i++) {
-            acgt[i] = Integer.parseInt(st.nextToken());
+            target[i] = Integer.parseInt(st.nextToken());
         }
-
-        for (int i = 0; i < m; i++) {
-            if (dna[i] == 'A') {cnt[0]++;}
-            else if (dna[i] == 'C') {cnt[1]++;}
-            else if (dna[i] == 'G') {cnt[2]++;}
-            else if (dna[i] == 'T') {cnt[3]++;}
+        int[] now = new int[4];
+        for (int i = 0; i < P; i++) {
+            if (str[i] == 'A') now[0]++;
+            if (str[i] == 'C') now[1]++;
+            if (str[i] == 'G') now[2]++;
+            if (str[i] == 'T') now[3]++;
         }
-
-        for (int j = 0; j < 4; j++) {
-            if (cnt[j] < acgt[j]) {
-                chk = false;
-            }
+        if (check(target, now)) ans++;
+        int idx = P;
+        while (idx < str.length) {
+            char first = str[idx - P];
+            char last = str[idx];
+            if (first == 'A') now[0]--;
+            if (first == 'C') now[1]--;
+            if (first == 'G') now[2]--;
+            if (first == 'T') now[3]--;
+            if (last == 'A') now[0]++;
+            if (last == 'C') now[1]++;
+            if (last == 'G') now[2]++;
+            if (last == 'T') now[3]++;
+            if (check(target, now)) ans++;
+            ++idx;
         }
+        System.out.println(ans);
+    }
 
-        if (chk == true) {
-            count++;
+    private static boolean check(int[] target, int[] now) {
+        for (int i = 0; i < 4; i++) {
+            if (target[i] > now[i]) return false;
         }
-
-        for (int i = m; i < n; i++) {
-            chk = true;
-            if (dna[i - m] == 'A') {cnt[0]--;}
-            else if (dna[i - m] == 'C') {cnt[1]--;}
-            else if (dna[i - m] == 'G') {cnt[2]--;}
-            else if (dna[i - m] == 'T') {cnt[3]--;}
-
-            if (dna[i] == 'A') {cnt[0]++;}
-            else if (dna[i] == 'C') {cnt[1]++;}
-            else if (dna[i] == 'G') {cnt[2]++;}
-            else if (dna[i] == 'T') {cnt[3]++;}
-
-            for (int j = 0; j < 4; j++) {
-                if (cnt[j] < acgt[j]) {
-                    chk = false;
-                }
-            }
-
-            if (chk == true) {
-                count++;
-            }
-        }
-        System.out.println(count);
+        return true;
     }
 }
