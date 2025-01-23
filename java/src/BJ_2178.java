@@ -7,53 +7,51 @@ import java.util.StringTokenizer;
 
 public class BJ_2178 {
 
-    static int[][] A;
-    static boolean[][] chk;
-    static int[] dx = {0, 0, -1, 1};
-    static int[] dy = {1, -1, 0, 0};
-    static int n, m;
+    static int[] dr = {-1, 1, 0, 0};
+    static int[] dc = {0, 0, -1, 1};
+    static int R, C;
+    static int[][] map;
+    static boolean[][] visited;
 
-    static boolean is_valid(int x, int y) {
-        return 0 <= x && x < n && 0 <= y && y < m;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        map = new int[R][C];
+        visited = new boolean[R][C];
+        for (int i = 0; i < R; i++) {
+            String s = br.readLine();
+            for (int j = 0; j < C; j++) {
+                map[i][j] = s.charAt(j) - '0';
+            }
+        }
+        bfs(0, 0, 1);
     }
 
-    static void BFS(int x, int y) {
+    private static void bfs(int r, int c, int depth) {
         Queue<int[]> q = new LinkedList<>();
-        q.offer(new int[] {x, y});
-        chk[x][y] = true;
+        q.offer(new int[] {r, c, depth});
+        visited[r][c] = true;
 
         while (!q.isEmpty()) {
-            int now[] = q.poll();
-            for (int i = 0; i < 4; i++) {
-                int nx = now[0] + dx[i];
-                int ny = now[1] + dy[i];
-
-                if (is_valid(nx, ny) && A[nx][ny] == 1 && !chk[nx][ny]) {
-                    chk[nx][ny] = true;
-                    q.offer(new int[] {nx, ny});
-                    A[nx][ny] = A[now[0]][now[1]] + 1;
+            int[] now = q.poll();
+            if (now[0] == R - 1 && now[1] == C - 1) {
+                System.out.println(now[2]);
+                return;
+            }
+            for (int d = 0; d < 4; d++) {
+                int nr = now[0] + dr[d];
+                int nc = now[1] + dc[d];
+                if (isValid(nr, nc) && !visited[nr][nc] && map[nr][nc] == 1) {
+                    q.offer(new int[] {nr, nc, now[2] + 1});
+                    visited[nr][nc] = true;
                 }
             }
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-
-        A = new int[n][m];
-        chk = new boolean[n][m];
-
-        for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            String line = st.nextToken();
-            for (int j = 0; j < m; j++) {
-                A[i][j] = Integer.parseInt(line.substring(j, j + 1));
-            }
-        }
-        BFS(0, 0);
-        System.out.println(A[n - 1][m - 1]);
+    private static boolean isValid(int r, int c) {
+        return 0 <= r && r < R && 0 <= c && c < C;
     }
 }
