@@ -1,135 +1,122 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-public class PG_340211 {
-    public static void main(String[] args) {
-        int[][] points = {{2, 2}, {2, 3}, {2, 7}, {6, 6}, {5, 2}};
-        int[][] routes = {{2, 3, 4, 5}, {1, 3, 4, 5}};
+class PG_340211 {
 
-        solution(points, routes);
-    }
+    class Point {
+        int r, c;
 
-    static class Robot implements Comparable<Robot> {
-        int r, c, nextR, nextC, lastR, lastC, robotIdx, countIdx;
-
-        public Robot(int r, int c, int nextR, int nextC, int lastR, int lastC, int robotIdx, int countIdx) {
+        public Point(int r, int c) {
             this.r = r;
             this.c = c;
-            this.nextR = nextR;
-            this.nextC = nextC;
-            this.lastR = lastR;
-            this.lastC = lastC;
-            this.robotIdx = robotIdx;
-            this.countIdx = countIdx;
-        }
-
-        public int compareTo(Robot o) {
-            if (this.r != o.r) return Integer.compare(this.r, o.r);
-            else return Integer.compare(this.c, o.c);
         }
     }
 
-    public static int solution(int[][] points, int[][] routes) {
-        int answer = 0; // 위험 발생 횟수
-        int n = routes.length;
-        List<Robot> robotList = new ArrayList<Robot>();
-        for (int i = 0; i < n; i++) {
-            int idx = routes[i][0];
-            int nextIdx = routes[i][1];
-            int lastIdx = routes[i][routes[i].length - 1];
-            int r = points[idx - 1][0];
-            int c = points[idx - 1][1];
-            int nextR = points[nextIdx - 1][0];
-            int nextC = points[nextIdx - 1][1];
-            int lastR = points[lastIdx - 1][0];
-            int lastC = points[lastIdx - 1][1];
-            robotList.add(new Robot(r, c, nextR, nextC, lastR, lastC, i, 1));
-        }
-        answer += countEmergency(robotList);
+    class Robot {
+        int no, r, c, target;
 
-        int time = 0;
-        while(true) {
-            ++time;
-
-            // 모든 로봇들을 이동
-            for(Robot robot : robotList) {
-                moveRobot(robot);
-            }
-
-            // 위험 상황 발생 횟수 더하기
-            answer += countEmergency(robotList);
-
-            // next 변화, 도착 처리
-            check(robotList, points, routes);
-
-            if (robotList.isEmpty()) {
-                System.out.println(answer);
-                return answer;
-            }
+        public Robot(int no, int r, int c, int target) {
+            this.no = no;
+            this.r = r;
+            this.c = c;
+            this.target = target;
         }
     }
 
-    // next와 last를 처리하는 메서드
-    private static void check(List<Robot> robotList, int[][] points, int[][] routes) {
-        Iterator<Robot> iterator = robotList.iterator();
-        while (iterator.hasNext()) {
-            Robot robot = iterator.next();
-            if (robot.r == robot.lastR && robot.c == robot.lastC && robot.countIdx == routes[robot.robotIdx].length - 1) {
-                iterator.remove(); // 안전하게 제거
-            } else if (robot.r == robot.nextR && robot.c == robot.nextC) {
-                int robotIdx = robot.robotIdx;
-                int countIdx = robot.countIdx;
-                int idx = routes[robotIdx][countIdx + 1];
-                robot.nextR = points[idx - 1][0];
-                robot.nextC = points[idx - 1][1];
-                robot.countIdx++;
+    static int[] dr = {-1, 1, 0, 0};
+    static int[] dc = {0, 0, -1, 1};
+    static Point[] pointArr;    // 포인터의 좌표 배열 1 ~ n 까지
+    static Queue<Robot> robots;  // 각 로봇의 현재 위치
+    static int answer;
+
+    public int solution(int[][] points, int[][] routes) {
+        answer = 0;
+        int n = points.length;  // 포인터의 갯수
+        int m = routes.length;  // 로봇의 수
+        pointArr = new Point[n + 1];
+        robots = new LinkedList<>();
+        for (int i = 1; i <= n; i++) {
+            pointArr[i] = new Point(points[i - 1][0], points[i - 1][1]);
+        }
+        for (int i = 0; i < m; i++) {
+            int nowPointIdx = routes[i][0];
+            robots.offer(new Robot(i, pointArr[nowPointIdx].r, pointArr[nowPointIdx].c, 1));
+        }
+
+        answer += countAnswer();
+        while (!robots.isEmpty()) {
+            int size = robots.size();
+
+            // 로봇들을 각각의 타겟을 향해서 이동
+            for (int i = 0; i < size; i++) {
+                Robot now = robots.poll();
+                moveRobot(now, routes);
             }
+
+            // 위험지역 더하기
+            answer += countAnswer();
+
+            // 타켓 변경 및 로봇 삭제
+            for (int i = 0; i < size; i++) {
+                Robot now = robots.poll();
+                checkTarget(now, routes);
+            }
+        }
+
+        return answer;
+    }
+
+    private void checkTarget(Robot robot, int[][] routes) {
+        int target = routes[robot.no][robot.target];    // 몇 번 포인트로 가야하는지
+        if (robot.r == pointArr[target].r && robot.c == pointArr[target].c) {
+            if (robot.target + 1 >= routes[robot.no].length) {
+                return;
+            }
+            robots.offer(new Robot(robot.no, robot.r, robot.c, robot.target + 1));
+        } else {
+            robots.offer(robot);
         }
     }
 
-    // 로봇을 이동
-    private static void moveRobot(Robot robot) {
-        int[] dr = {-1, 1, 0, 0};
-        int[] dc = {0, 0, -1, 1};
-        int minR = robot.r;
-        int minC = robot.c;
-        int minDist = Math.abs(robot.r - robot.nextR) + Math.abs(robot.c - robot.nextC);
+    private void moveRobot(Robot robot, int[][] routes) {
+        int maxDist = Integer.MAX_VALUE;
+        int target = routes[robot.no][robot.target];    // 어느 포인트로 가야하는지
+        int r = -1;
+        int c = -1;
 
         for (int d = 0; d < 4; d++) {
             int nr = robot.r + dr[d];
             int nc = robot.c + dc[d];
-            int dist = Math.abs(nr - robot.nextR) + Math.abs(nc - robot.nextC);
-
-            if (dist < minDist) {
-                minR = nr;
-                minC = nc;
-                minDist = dist;
+            int dist = Math.abs(pointArr[target].r - nr) + Math.abs(pointArr[target].c - nc);
+            if (maxDist > dist) {
+                maxDist = dist;
+                r = nr;
+                c = nc;
             }
         }
-
-        robot.r = minR;
-        robot.c = minC;
+        robots.offer(new Robot(robot.no, r, c, robot.target));
     }
 
-    // 위험 상황 발생 횟수 구하기 메서드
-    private static int countEmergency(List<Robot> robotList) {
-        int emergency = 0;
-        Collections.sort(robotList);
-        boolean flag = false;
+    // 충돌 갯수를 구하는 메서드
+    private int countAnswer() {
+        Map<String, Integer> map = new HashMap<>();
 
-        for (int i = 1; i < robotList.size(); i++) {
-            Robot now = robotList.get(i);
-            Robot prev = robotList.get(i - 1);
-            if (now.r == prev.r && now.c == prev.c) {
-                if (flag) continue;
-                flag = true;
-                ++emergency;
+        for (Robot now : robots) {
+            String p = String.valueOf(now.r) + " " + String.valueOf(now.c);
+            if (map.containsKey(p)) {
+                int cnt = map.get(p);
+                map.put(p, cnt + 1);
             } else {
-                flag = false;
+                map.put(p, 1);
             }
         }
-        return emergency;
+
+        int answer = 0;
+
+        for (String s : map.keySet()) {
+            int cnt = map.get(s);
+            if (cnt > 1) ++answer;
+        }
+
+        return answer;
     }
 }
