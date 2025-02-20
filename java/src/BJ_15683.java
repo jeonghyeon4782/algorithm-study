@@ -1,177 +1,111 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class BJ_15683 {
+    static class CCTV {
+        int r, c, num;
 
-    // 상 우 하 좌
-    static int[] dx = {-1, 0, 1, 0};
-    static int[] dy = {0, 1, 0, -1};
+        public CCTV(int r, int c, int num) {
+            this.r = r;
+            this.c = c;
+            this.num = num;
+        }
+    }
+
+    // 상하좌우
+    static int[] dr = {-1, 1, 0, 0};
+    static int[] dc = {0, 0, -1, 1};
+    static int[][][] distList = {
+            {},
+            {{0}, {1}, {2}, {3}},
+            {{0, 1}, {2, 3}},
+            {{0, 3}, {1, 3}, {1, 2}, {0, 2}},
+            {{0, 1, 2}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3}},
+            {{0, 1, 2, 3}}
+    };
+    static int R, C;
     static int[][] map;
-    static int[][] cMap;
-    static int n, m;
+    static List<CCTV> cctvList;
+    static int total, answer;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        map = new int[n][m];
-        cMap = new int[n][m];
-        for (int i = 0; i < n; i++) {
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        map = new int[R][C];
+        cctvList = new ArrayList<>();
+        for (int i = 0; i < R; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < m; j++) {
+            for (int j = 0; j < C; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
-                cMap[i][j] = map[i][j];
-            }
-        }
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (map[i][j] != 0 && map[i][j] != 6) {
-                    cctv(i, j, map[i][j]);
-                    for (int t = 0; t < n; t++) {
-                        System.out.println(Arrays.toString(cMap[t]));
-                    }
-                    System.out.println();
+                if (1 <= map[i][j] && map[i][j] <= 6) ++total;
+                if (1 <= map[i][j] && map[i][j] <= 5) {
+                    cctvList.add(new CCTV(i, j, map[i][j]));
                 }
             }
         }
-        int answer = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (cMap[i][j] == 0) answer++;
-            }
-        }
+        answer = Integer.MAX_VALUE;
+        total = R * C - total;
+        dfs(0, new boolean[R][C]);
         System.out.println(answer);
     }
 
-    static boolean is_valid(int x, int y) {
-        return 0 <= x && x < n && 0 <= y && y < m;
-    }
+    private static void dfs(int depth, boolean[][] visited) {
+        if (depth == cctvList.size()) {
+//            for (int r = 0; r < R; r++) {
+//                System.out.println(Arrays.toString(visited[r]));
+//            }
+//            System.out.println();
+            int cnt = 0;
+            for (int r = 0; r < R; r++) {
+                for (int c = 0; c < C; c++) {
+                    if (visited[r][c]) ++cnt;
+                }
+            }
+            answer = Math.min(answer, total - cnt);
+            return;
+        }
 
-    public static void cctv(int x, int y, int r) {
-        int[] count = cctvCheck(x, y);
-        switch (r) {
-            case 1:
-                int maxCount = 0;
-                int dist = 0;
-                for (int i = 0; i < 4; i++) {
-                    if (count[i] > maxCount) {
-                        maxCount = count[i];
-                        dist = i;
-                    }
+        CCTV cctv = cctvList.get(depth);
+
+        for (int[] arr : distList[cctv.num]) {
+            boolean[][] newVisited = new boolean[R][C];
+            for (int r = 0; r < R; r++) {
+                for (int c = 0; c < C; c++) {
+                    newVisited[r][c] = visited[r][c];
                 }
-                change(x, y, dist);
-                break;
-            case 2:
-                // 상하로 했을 때 사각지대가 더 많다면
-                if (count[0] + count[2] > count[1] + count[3]) {
-                    change(x, y, 0);
-                    change(x, y, 2);
-                } else {
-                    change(x, y, 1);
-                    change(x, y, 3);
-                }
-                break;
-            case 3:
-                int maxNum = 0;
-                for (int i = 0; i < 4; i++) {
-                    if (i == 3) {
-                        if (maxNum < count[3] + count[0]) maxNum = count[3] + count[0];
-                    } else {
-                        if (maxNum < count[i] + count[i + 1]) maxNum = count[i] + count[i + 1];
-                    }
-                }
-                if (count[0] + count[1] == maxNum) {
-                    change(x, y, 0);
-                    change(x, y, 1);
-                }
-                else if (count[1] + count[2] == maxNum) {
-                    change(x, y, 1);
-                    change(x, y, 2);
-                }
-                else if (count[2] + count[3] == maxNum) {
-                    change(x, y, 2);
-                    change(x, y, 3);
-                }
-                else if (count[3] + count[0] == maxNum) {
-                    change(x, y, 3);
-                    change(x, y, 0);
-                }
-                break;
-            case 4:
-                maxNum = 0;
-                for (int i = 0; i < 4; i++) {
-                    if (i == 2) {
-                        if (maxNum < count[2] + count[3] + count[0]) maxNum = count[2] + count[3] + count[0];
-                    } else if (i == 3) {
-                        if (maxNum < count[3] + count[0] + count[1]) maxNum = count[3] + count[0] + count[1];
-                    } else {
-                        if (maxNum < count[i] + count[i + 1] + count[i + 2]) maxNum = count[i] + count[i + 1] + count[i + 2];
-                    }
-                }
-                if (count[0] + count[1] + count[2] == maxNum) {
-                    change(x, y, 0);
-                    change(x, y, 1);
-                    change(x, y, 2);
-                }
-                else if (count[1] + count[2] + count[3] == maxNum) {
-                    change(x, y, 1);
-                    change(x, y, 2);
-                    change(x, y, 3);
-                }
-                else if (count[2] + count[3] + count[0] == maxNum) {
-                    change(x, y, 2);
-                    change(x, y, 3);
-                    change(x, y, 0);
-                }
-                else if (count[3] + count[0] + count[1] == maxNum) {
-                    change(x, y, 3);
-                    change(x, y, 0);
-                    change(x, y, 1);
-                }
-                break;
-            case 5:
-                change(x, y, 1);
-                change(x, y, 2);
-                change(x, y, 3);
-                change(x, y, 0);
-                break;
+            }
+
+            dfs(depth + 1, solve(cctv, newVisited, arr));
         }
     }
 
-    public static int[] cctvCheck(int x, int y) {
-        int[] count = new int[4];
-
-        for (int i = 0; i < 4; i++) {
-            int nx = x;
-            int ny = y;
+    private static boolean[][] solve(CCTV cctv, boolean[][] visited, int[] dist) {
+        for (int d : dist) {
+            int r = cctv.r;
+            int c = cctv.c;
             while (true) {
-                nx = nx + dx[i];
-                ny = ny + dy[i];
-                if (!is_valid(nx, ny)) break;
-                else if (cMap[nx][ny] == 6) break;
-                else if (cMap[nx][ny] == 0) count[i]++;
-                else continue;
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (!isValid(nr, nc)) break;
+                if (map[nr][nc] == 6) break;
+                if (!(1 <= map[nr][nc] && map[nr][nc] <= 5)) visited[nr][nc] = true;
+
+                r = nr;
+                c = nc;
             }
         }
-        return count;
+
+        return visited;
     }
 
-    public static void change(int x, int y, int r) {
-        for (int i = 0; i < 4; i++) {
-            int nx = x;
-            int ny = y;
-            while (true) {
-                nx = nx + dx[r];
-                ny = ny + dy[r];
-                if (!is_valid(nx, ny)) break;
-                else if (cMap[nx][ny] == 6) break;
-                else if (cMap[nx][ny] == 0) cMap[nx][ny] = -1;
-                else continue;
-            }
-        }
+    private static boolean isValid(int r, int c) {
+        return 0 <= r && r < R && 0 <= c && c < C;
     }
 }
