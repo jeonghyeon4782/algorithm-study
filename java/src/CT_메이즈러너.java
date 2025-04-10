@@ -1,178 +1,223 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 public class CT_메이즈러너 {
-
+    // 좌표 클래스
     static class Point {
         int r, c;
+
         public Point(int r, int c) {
             this.r = r;
             this.c = c;
         }
-    }
-    
-    // 상하좌우
-    static int[] dr = {-1, 1, 0, 0};
-    static int[] dc = {0, 0, -1 , 1};
 
-    static int N, M, K;     // N : 격자의 크기, M : 참가자 수, K : 게임 시간
-    static int[][] map;
-    static List<Point> playerList;
-    static Point exit;
+        @Override
+        public String toString() {
+            return "Point [r=" + r + ", c=" + c + "]";
+        }
+    }
+
+    // 정사각형 클래스
+    static class Square implements Comparable<Square> {
+        int sr, sc, er, ec;
+
+        public Square(int sr, int sc, int er, int ec) {
+            this.sr = sr;
+            this.sc = sc;
+            this.er = er;
+            this.ec = ec;
+        }
+
+        @Override
+        public int compareTo(Square o) {
+            int now = Math.abs(this.sr - this.er);
+            int next = Math.abs(o.sr - o.er);
+            if (now != next)
+                return Integer.compare(now, next); // 사각형의 크기가 작은 순
+            if (this.sr != o.sr)
+                return Integer.compare(this.sr, o.sr); // r이 작은 순
+            return Integer.compare(this.sc, o.sc); // c가 작은 순;
+        }
+
+        @Override
+        public String toString() {
+            return "Square [sr=" + sr + ", sc=" + sc + ", er=" + er + ", ec=" + ec + "]";
+        }
+    }
+
+    static int N, M, K; // 격자의 크기, 참가자 수, 게임 시간
+    // 0 : 상, 1 : 하, 2 : 좌, 3 : 우
+    static int[] dr = { -1, 1, 0, 0 };
+    static int[] dc = { 0, 0, -1, 1 };
+    static Point exit; // 출구 좌표
+    static int[][] map; // 미로
+    static List<Point> manList; // 참가자 위치 리스트
+    static List<Square> squareList; // 가능한 정사각형 리스트
 
     public static void main(String[] args) throws IOException {
-        // setting
+
+        // 1. Setting
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
         map = new int[N][N];
-        playerList = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
+        manList = new ArrayList<>();
+        for (int r = 0; r < N; r++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
+            for (int c = 0; c < N; c++) {
+                map[r][c] = Integer.parseInt(st.nextToken());
             }
         }
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int r = Integer.parseInt(st.nextToken()) - 1;
             int c = Integer.parseInt(st.nextToken()) - 1;
-            playerList.add(new Point(r, c));
-            map[r][c] = -1;
+            manList.add(new Point(r, c));
         }
         st = new StringTokenizer(br.readLine());
-        exit = new Point(Integer.parseInt(st.nextToken()) - 1, Integer.parseInt(st.nextToken()) - 1);
+        int pointR = Integer.parseInt(st.nextToken()) - 1;
+        int pointC = Integer.parseInt(st.nextToken()) - 1;
+        exit = new Point(pointR, pointC);
+        int cnt = 0; // 참가자들의 이동 횟수
 
-        // 게임 시작
-        int time = 0;
-        while (time < 1) {
-            // 1. 시간 증가
-            ++time;
+        // k번 만큼 반복
+        for (int k = 0; k < K; k++) {
 
-            // 2. 모든 참가자 이동
-            int minDist = movePlayer();
-            
-            // 3. 게임 종료 여부 판단
-            if (playerList.isEmpty()) {
+            // 2. 참가자 이동
+            Iterator<Point> iterator = manList.iterator();
+            while (iterator.hasNext()) {
+                Point man = iterator.next();
+                int realD = -1;
+                int nowDist = Math.abs(exit.r - man.r) + Math.abs(exit.c - man.c);
+                for (int d = 0; d < 4; d++) {
+                    int nr = man.r + dr[d];
+                    int nc = man.c + dc[d];
+                    int dist = Math.abs(exit.r - nr) + Math.abs(exit.c - nc);
+                    if (isValid(nr, nc) && nowDist > dist && map[nr][nc] == 0) {
+                        nowDist = dist;
+                        realD = d;
+                    }
+                }
+                // 이동 가능할 경우 이동
+                if (realD != -1) {
+                    man.r += dr[realD];
+                    man.c += dc[realD];
+                    cnt++;
+                }
+                // 출구 도달 시 제거
+                if (man.r == exit.r && man.c == exit.c) {
+                    iterator.remove(); // Iterator로 안전하게 제거
+                }
+            }
+            // 만약 참가자가 없다면 즉시 종료
+            if (manList.isEmpty()) {
+                System.out.println(cnt);
+                System.out.println((exit.r + 1) + " " + (exit.c + 1));
                 return;
             }
-        }
-    }
 
-    // 회전 가능한 사각형 중 가장 상단 왼쪽에 있는 사각형을 탐색하는 메서드
-    private static void searchRotateSquare(int minDist) {
-        for (int i = minDist - 1; i < minDist + 1; i++) {
-            if (isValid(exit.r - i, exit.c - i) && isValidSquare(exit.r - i, exit.r, exit.c - i, exit.c)) {
-                RotateSquare(exit.r - i, exit.r, exit.c - i, exit.c);
-                return;
-            }
-            if (isValid(exit.r - i, exit.c + i) && isValidSquare(exit.r - i, exit.r, exit.c, exit.c + i)) {
-                // 처리 로직 추가
-                return;
-            }
-            if (isValid(exit.r + i, exit.c - i) && isValidSquare(exit.r, exit.r + i, exit.c - i, exit.c)) {
-                // 처리 로직 추가
-                return;
-            }
-            if (isValid(exit.r + i, exit.c + i) && isValidSquare(exit.r, exit.r + i, exit.c, exit.c + i)) {
-                // 처리 로직 추가
-                return;
-            }
-        }
-    }
+            // 3. 최적의 정사각형 찾기
+            squareList = new ArrayList<>();
+            for (int size = 1; size < N; size++) { // 정사각형의 한 변: 2~N
+                for (int sr = 0; sr <= N - size - 1; sr++) {
+                    for (int sc = 0; sc <= N - size - 1; sc++) {
+                        int er = sr + size;
+                        int ec = sc + size;
 
-    // 맵을 90도 회전시키는 메서드
-    private static void RotateSquare(int startR, int endR, int startC, int endC) {
-        
-    }
+                        // 출구 포함 확인
+                        if (!(exit.r >= sr && exit.r <= er && exit.c >= sc && exit.c <= ec)) continue;
 
-    // 사각형 내에 플레이어가 있는지 확인하는 메서드
-    private static boolean isValidSquare(int startR, int endR, int startC, int endC) {
-        for (Point player : playerList) {
-            if (startR <= player.r && player.r <= endR && startC <= player.c && player.c <= endC) {
-                return true;
-            }
-        }
-        return false;
-    }
+                        // 참가자 포함 확인
+                        boolean hasMan = false;
+                        for (Point man : manList) {
+                            if (man.r >= sr && man.r <= er && man.c >= sc && man.c <= ec) {
+                                hasMan = true;
+                                break;
+                            }
+                        }
+                        if (!hasMan) continue;
 
-
-    // 참가자들을 모두 이동시키는 메서드
-    private static int movePlayer() {
-        // 참가자 이동
-        int answer = Integer.MAX_VALUE;
-        Iterator<Point> list = playerList.iterator();
-        while (list.hasNext()) {
-            Point player = list.next();
-            int changeR = -1;
-            int changeC = -1;
-            int minDist = Math.abs(player.r - exit.r) + Math.abs(player.c - exit.c);
-
-            for (int d = 0; d < 4; d++) {
-                int nr = player.r + dr[d];
-                int nc = player.c + dc[d];
-
-                if (isValid(nr, nc) && map[nr][nc] == 0) {
-                    int dist = Math.abs(nr - exit.r) + Math.abs(nc - exit.c);
-                    if (dist < minDist) {
-                        changeR = nr;
-                        changeC = nc;
-                        minDist = dist;
+                        squareList.add(new Square(sr, sc, er, ec));
                     }
                 }
             }
-            
-            // 만약 이동을 했다면 플레이어를 적절한 곳에 이동처리
-            if (changeR != -1 && changeC != -1) {
-                player.r = changeR;
-                player.c = changeC;
-            }
+            Collections.sort(squareList);
 
-            int changeDist = Math.min(answer, Math.abs(player.r - exit.r) + Math.abs(player.c - exit.c));
-            if (changeDist != 0) {
-                // 플레이어 이동 후 거리 중 최단 거리를 구한다.
-                answer = Math.min(answer, changeDist);
-            } else {
-                // 만약 이동 후 거리가 0이면 플레이어를 삭제한다.
-                list.remove();
+            // 4. 배열 돌리기
+            int sr = squareList.get(0).sr;
+            int er = squareList.get(0).er;
+            int sc = squareList.get(0).sc;
+            int ec = squareList.get(0).ec;
+            int dist = er - sr; // 정사각형의 차이
+            int[][] newMap = new int[dist + 1][dist + 1];
+            // 미로 돌리기
+            for (int r = 0; r < dist + 1; r++) {
+                for (int c = 0; c < dist + 1; c++) {
+                    newMap[r][c] = map[r + sr][c + sc];
+                }
             }
+            int[][] rotatedMap = new int[dist + 1][dist + 1];
+            for (int r = 0; r < dist + 1; r++) {
+                for (int c = 0; c < dist + 1; c++) {
+                    rotatedMap[c][dist - r] = Math.max(0, newMap[r][c] - 1);
+                }
+            }
+            for (int r = 0; r < dist + 1; r++) {
+                for (int c = 0; c < dist + 1; c++) {
+                    map[sr + r][sc + c] = rotatedMap[r][c];
+                }
+            }
+            // 참가자 돌리기
+            for (int i = 0; i < manList.size(); i++) {
+                int nowR = manList.get(i).r;
+                int nowC = manList.get(i).c;
+                if (sr <= nowR && nowR <= er && sc <= nowC && nowC <= ec) {
+                    int offsetR = nowR - sr;
+                    int offsetC = nowC - sc;
+                    int newR = offsetC;
+                    int newC = dist - offsetR;
+                    manList.get(i).r = sr + newR;
+                    manList.get(i).c = sc + newC;
+                }
+            }
+            // 출구 돌리기
+            int exitNowR = exit.r;
+            int exitNowC = exit.c;
+            int offsetR = exitNowR - sr;
+            int offsetC = exitNowC - sc;
+            int newExitR = offsetC;
+            int newExitC = dist - offsetR;
+            exit.r = sr + newExitR;
+            exit.c = sc + newExitC;
         }
 
-        // 메서드 처리 후 모든 플레어어 중 출구와 가장 가까운 플레어이의 최단거리를 리턴
-        return answer;
+        // 5. 출력
+        System.out.println(cnt);
+        System.out.println((exit.r + 1) + " " + (exit.c + 1));
     }
 
-    // 맵 밖으로 나가는 지 확인하는 메서드
+    ///////////////////////////////////////////////////////////////////////////
+
+    // 미로를 출력하는 메서드
+    private static void showMap() {
+        System.out.println("미로 출력");
+        for (int r = 0; r < N; r++) {
+            System.out.println(Arrays.toString(map[r]));
+        }
+        System.out.println();
+    }
+
+    // 이동이 가능한 지 확인하는 메서드
     private static boolean isValid(int r, int c) {
         return 0 <= r && r < N && 0 <= c && c < N;
-    }
-
-    // 현재 맵을 보여주는 메서드
-    private static void showMap() {
-        System.out.println("현재 맵의 상태");
-        for (int i = 0; i < N; i++) {
-            System.out.println(Arrays.toString(map[i]));
-        }
-        System.out.println();
-    }
-
-    // 현재 플레이어들의 위치를 보여주는 메서드
-    private static void showPlayerList() {
-        System.out.println("현재 플레이어들의 위치");
-        for (Point player : playerList) {
-            System.out.println(player.r + " " + player.c);
-        }
-        System.out.println();
-    }
-    
-    // 현재 출구의 위치를 보여주는 메서드
-    private static void showExit() {
-        System.out.println("현재 출구의 위치");
-        System.out.println(exit.r + " " + exit.c);
-        System.out.println();
     }
 }
