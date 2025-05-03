@@ -57,10 +57,6 @@ public class BJ_15683 {
 
     private static void dfs(int depth, boolean[][] visited) {
         if (depth == cctvList.size()) {
-//            for (int r = 0; r < R; r++) {
-//                System.out.println(Arrays.toString(visited[r]));
-//            }
-//            System.out.println();
             int cnt = 0;
             for (int r = 0; r < R; r++) {
                 for (int c = 0; c < C; c++) {
