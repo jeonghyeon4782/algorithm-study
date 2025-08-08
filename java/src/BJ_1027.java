@@ -15,7 +15,7 @@ public class BJ_1027 {
         int answer = 0;
         for (int i = 0; i < N; i++) {
             int cnt = 0;
-            double min = Double.POSITIVE_INFINITY;
+            double min = Double.POSITIVE_INFINITY;  
             double max = Double.NEGATIVE_INFINITY;
 
             for (int j = i - 1; j >= 0; j--) {
