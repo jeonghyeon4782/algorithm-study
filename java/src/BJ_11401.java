@@ -1,0 +1,20 @@
+import java.util.Scanner;
+
+public class BJ_11401 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int N = sc.nextInt();
+        int K = sc.nextInt();
+        int[][] dp = new int[N + 1][K + 1];
+
+        for (int i = 0; i <= N; i++) {
+            for (int j = 0; j <= Math.min(i, K); j++) {
+                if (i == j || j == 0) dp[i][j] = 1;
+                else {
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j];
+                }
+            }
+        }
+        System.out.println(dp[N][K] % 1000000007);
+    }
+}
